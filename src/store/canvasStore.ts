@@ -47,7 +47,7 @@ export const useCanvasStore = create<CanvasStore>((set, get) => ({
           ...connection,
           type: 'smoothstep',
           animated: false,
-          style: { stroke: 'rgba(124,58,237,0.6)', strokeWidth: 2 },
+          style: { stroke: '#d4d4d4', strokeWidth: 1.5 },
         },
         get().edges
       ),

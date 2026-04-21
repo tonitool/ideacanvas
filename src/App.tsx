@@ -15,7 +15,7 @@ import { nodeTypes } from '@/nodes/nodeTypes';
 import { useCanvasStore } from '@/store/canvasStore';
 import Toolbar from '@/components/Toolbar';
 import ApiKeyModal from '@/components/ApiKeyModal';
-import type { IdeaNode, PromptNode, CustomNode, CustomNodeData } from '@/types';
+import type { IdeaNode, PromptNode, CustomNode } from '@/types';
 import { IDEA_COLORS } from '@/types';
 
 let counter = 0;
@@ -87,7 +87,7 @@ function CanvasInner() {
         source: id,
         target: newId,
         type: 'smoothstep',
-        style: { stroke: 'rgba(124,58,237,0.5)', strokeWidth: 1.5 },
+        style: { stroke: '#d4d4d4', strokeWidth: 1.5 },
       }]);
     };
     window.addEventListener('expand-generated-node', handler);
@@ -113,38 +113,29 @@ function CanvasInner() {
         multiSelectionKeyCode="Shift"
         panOnDrag={[1, 2]}
         elevateEdgesOnSelect
-        colorMode="dark"
       >
-        <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="rgba(255,255,255,0.07)" />
+        <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="rgba(0,0,0,0.08)" />
         <Controls showInteractive={false} />
         <MiniMap
           pannable
           zoomable
-          nodeColor={(node) => {
-            const d = node.data as CustomNodeData;
-            if (d.kind === 'idea') return d.color;
-            if (d.kind === 'prompt') return '#2563eb';
-            if (d.kind === 'summary') return '#7c3aed';
-            if (d.kind === 'generated') return d.color;
-            if (d.kind === 'image') return '#0891b2';
-            return '#444';
-          }}
+          nodeColor={() => 'rgba(0,0,0,0.2)'}
           style={{ bottom: 12, right: 12 }}
         />
 
         {nodes.length === 0 && (
           <Panel position="top-center">
             <div style={{
-              marginTop: 40, textAlign: 'center', color: 'rgba(255,255,255,0.18)',
+              marginTop: 40, textAlign: 'center', color: '#a3a3a3',
               fontSize: 14, pointerEvents: 'none', userSelect: 'none',
             }}>
-              <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.4 }}>✦</div>
-              <p style={{ marginBottom: 4, fontWeight: 500 }}>Your idea canvas is empty</p>
+              <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.25 }}>✦</div>
+              <p style={{ marginBottom: 4, fontWeight: 500, color: '#525252' }}>Your idea canvas is empty</p>
               <p style={{ fontSize: 12 }}>
                 Double-click anywhere · Press{' '}
-                <kbd style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 3, padding: '1px 6px', fontFamily: 'monospace', fontSize: 11 }}>I</kbd>
+                <kbd style={{ background: '#f5f5f5', border: '1px solid #e5e5e5', borderRadius: 3, padding: '1px 6px', fontFamily: 'monospace', fontSize: 11, color: '#525252' }}>I</kbd>
                 {' '}for idea ·{' '}
-                <kbd style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 3, padding: '1px 6px', fontFamily: 'monospace', fontSize: 11 }}>P</kbd>
+                <kbd style={{ background: '#f5f5f5', border: '1px solid #e5e5e5', borderRadius: 3, padding: '1px 6px', fontFamily: 'monospace', fontSize: 11, color: '#525252' }}>P</kbd>
                 {' '}for AI prompt
               </p>
             </div>

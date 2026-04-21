@@ -1,24 +1,13 @@
 import { memo, useCallback, useRef, useEffect } from 'react';
 import { Handle, Position, NodeResizer } from '@xyflow/react';
 import type { NodeProps } from '@xyflow/react';
-import { Lightbulb, Trash2, ArrowRight } from 'lucide-react';
+import { Trash2, ArrowRight } from 'lucide-react';
 import type { GeneratedNode } from '../types';
-import { GENERATED_COLORS } from '../types';
 import { useCanvasStore } from '../store/canvasStore';
-
-const PALETTES = [
-  { bg: 'rgba(79,70,229,0.13)', border: 'rgba(79,70,229,0.45)', accent: '#4f46e5', light: '#818cf8' },
-  { bg: 'rgba(2,132,199,0.13)', border: 'rgba(2,132,199,0.45)', accent: '#0284c7', light: '#38bdf8' },
-  { bg: 'rgba(13,148,136,0.13)', border: 'rgba(13,148,136,0.45)', accent: '#0d9488', light: '#2dd4bf' },
-  { bg: 'rgba(202,138,4,0.13)', border: 'rgba(202,138,4,0.45)', accent: '#ca8a04', light: '#fbbf24' },
-  { bg: 'rgba(147,51,234,0.13)', border: 'rgba(147,51,234,0.45)', accent: '#9333ea', light: '#c084fc' },
-];
 
 function GeneratedNodeComponent({ id, data, selected }: NodeProps<GeneratedNode>) {
   const { updateNodeData, removeNode } = useCanvasStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const colorIdx = GENERATED_COLORS.indexOf(data.color);
-  const palette = PALETTES[colorIdx >= 0 ? colorIdx % PALETTES.length : data.index % PALETTES.length];
 
   const autoResize = useCallback(() => {
     const el = textareaRef.current;
@@ -48,48 +37,63 @@ function GeneratedNodeComponent({ id, data, selected }: NodeProps<GeneratedNode>
     <div
       className="node-enter"
       style={{
-        background: palette.bg,
-        border: `1.5px solid ${selected ? palette.accent : palette.border}`,
-        borderRadius: 12,
+        background: '#fff',
+        border: `1px solid ${selected ? '#000' : '#e5e5e5'}`,
+        borderRadius: 10,
         minWidth: 200,
-        backdropFilter: 'blur(8px)',
         boxShadow: selected
-          ? `0 0 0 2px ${palette.accent}, 0 8px 32px rgba(0,0,0,0.4)`
-          : '0 4px 20px rgba(0,0,0,0.3)',
-        transition: 'box-shadow 0.2s ease',
+          ? '0 0 0 1.5px #000'
+          : '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)',
+        transition: 'box-shadow 0.15s ease, border-color 0.15s ease',
       }}
     >
       <NodeResizer
         minWidth={180}
         minHeight={70}
         isVisible={!!selected}
-        lineStyle={{ borderColor: palette.accent, borderWidth: 1 }}
-        handleStyle={{ background: palette.accent, width: 8, height: 8, borderRadius: 4 }}
+        lineStyle={{ borderColor: '#000', borderWidth: 1 }}
+        handleStyle={{ background: '#000', width: 6, height: 6, borderRadius: 3 }}
       />
 
-      <div
-        style={{
-          background: `${palette.accent}22`,
-          borderBottom: `1px solid ${palette.border}`,
-          borderRadius: '10px 10px 0 0',
-          padding: '6px 10px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 5,
-        }}
-      >
-        <Lightbulb size={11} color={palette.light} />
-        <span style={{ color: palette.light, fontSize: 10, fontWeight: 600, flex: 1 }}>IDEA {data.index + 1}</span>
-        <button className="nodrag" onClick={onExpand} title="Expand with AI"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)', padding: 2, display: 'flex' }}>
+      {/* Header */}
+      <div style={{
+        borderBottom: '1px solid #f0f0f0',
+        borderRadius: '9px 9px 0 0',
+        padding: '6px 10px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        background: '#fafafa',
+      }}>
+        <span style={{
+          fontSize: 10, fontWeight: 600,
+          letterSpacing: '0.08em', textTransform: 'uppercase',
+          color: '#a3a3a3', flex: 1,
+        }}>
+          Idea {data.index + 1}
+        </span>
+        <button
+          className="nodrag"
+          onClick={onExpand}
+          title="Expand with AI"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d4d4d4', padding: 2, display: 'flex', borderRadius: 4, transition: 'color 0.15s' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#737373')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#d4d4d4')}
+        >
           <ArrowRight size={11} />
         </button>
-        <button className="nodrag" onClick={() => removeNode(id)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)', padding: 2, display: 'flex' }}>
+        <button
+          className="nodrag"
+          onClick={() => removeNode(id)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d4d4d4', padding: 2, display: 'flex', borderRadius: 4, transition: 'color 0.15s' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#737373')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#d4d4d4')}
+        >
           <Trash2 size={11} />
         </button>
       </div>
 
+      {/* Body */}
       <div style={{ padding: '8px 10px 10px' }}>
         <textarea
           ref={textareaRef}
@@ -98,14 +102,14 @@ function GeneratedNodeComponent({ id, data, selected }: NodeProps<GeneratedNode>
           onChange={onTextChange}
           placeholder="Generated idea..."
           rows={2}
-          style={{ color: 'rgba(255,255,255,0.85)', fontSize: 12, lineHeight: 1.6 }}
+          style={{ color: '#171717', fontSize: 12, lineHeight: 1.6 }}
         />
       </div>
 
-      <Handle type="target" position={Position.Left} style={{ left: -6, top: '50%' }} />
-      <Handle type="source" position={Position.Right} style={{ right: -6, top: '50%' }} />
-      <Handle type="target" position={Position.Top} id="top" style={{ top: -6, left: '50%' }} />
-      <Handle type="source" position={Position.Bottom} id="bottom" style={{ bottom: -6, left: '50%' }} />
+      <Handle type="target" position={Position.Left} style={{ left: -5, top: '50%' }} />
+      <Handle type="source" position={Position.Right} style={{ right: -5, top: '50%' }} />
+      <Handle type="target" position={Position.Top} id="top" style={{ top: -5, left: '50%' }} />
+      <Handle type="source" position={Position.Bottom} id="bottom" style={{ bottom: -5, left: '50%' }} />
     </div>
   );
 }

@@ -72,7 +72,7 @@ function PromptNodeComponent({ id, data, selected, positionAbsoluteX, positionAb
           target: summaryId,
           type: 'smoothstep',
           animated: true,
-          style: { stroke: 'rgba(124,58,237,0.8)', strokeWidth: 2 },
+          style: { stroke: '#000', strokeWidth: 1.5 },
         },
         ...generatedNodes.map((gn) => ({
           id: `e-summary-${gn.id}`,
@@ -80,7 +80,7 @@ function PromptNodeComponent({ id, data, selected, positionAbsoluteX, positionAb
           target: gn.id,
           type: 'smoothstep',
           animated: false,
-          style: { stroke: 'rgba(79,70,229,0.5)', strokeWidth: 1.5 },
+          style: { stroke: '#d4d4d4', strokeWidth: 1.5 },
         })),
       ];
 
@@ -105,42 +105,57 @@ function PromptNodeComponent({ id, data, selected, positionAbsoluteX, positionAb
     <div
       className={`node-enter ${isLoading ? 'ai-loading' : ''}`}
       style={{
-        background: isLoading ? undefined : 'rgba(37,99,235,0.12)',
-        border: `1.5px solid ${selected ? '#2563eb' : 'rgba(37,99,235,0.45)'}`,
-        borderRadius: 12,
+        background: isLoading ? undefined : '#fff',
+        border: `1.5px dashed ${selected ? '#000' : '#a3a3a3'}`,
+        borderRadius: 10,
         minWidth: 260,
-        backdropFilter: 'blur(8px)',
         boxShadow: selected
-          ? '0 0 0 2px #2563eb, 0 8px 32px rgba(0,0,0,0.4)'
-          : '0 4px 20px rgba(0,0,0,0.3)',
-        transition: 'box-shadow 0.2s ease',
+          ? '0 0 0 1.5px #000'
+          : '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)',
+        transition: 'box-shadow 0.15s ease, border-color 0.15s ease',
       }}
     >
-      <div
-        style={{
-          background: 'rgba(37,99,235,0.2)',
-          borderBottom: '1px solid rgba(37,99,235,0.3)',
-          borderRadius: '10px 10px 0 0',
-          padding: '7px 10px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-        }}
-      >
-        <Sparkles size={12} color="#60a5fa" />
-        <span style={{ color: '#60a5fa', fontSize: 11, fontWeight: 600, flex: 1 }}>AI PROMPT</span>
+      {/* Header */}
+      <div style={{
+        borderBottom: '1px solid #f0f0f0',
+        borderRadius: '8px 8px 0 0',
+        padding: '6px 10px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        background: '#fafafa',
+      }}>
+        <Sparkles size={11} color="#a3a3a3" />
+        <span style={{
+          fontSize: 10, fontWeight: 600,
+          letterSpacing: '0.08em', textTransform: 'uppercase',
+          color: '#a3a3a3', flex: 1,
+        }}>
+          AI Prompt
+        </span>
         {data.status === 'error' && (
-          <button className="nodrag" onClick={onReset}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', padding: 2, display: 'flex' }}>
-            <RotateCcw size={12} />
+          <button
+            className="nodrag"
+            onClick={onReset}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d4d4d4', padding: 2, display: 'flex', borderRadius: 4, transition: 'color 0.15s' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#737373')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#d4d4d4')}
+          >
+            <RotateCcw size={11} />
           </button>
         )}
-        <button className="nodrag" onClick={() => removeNode(id)}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 2, display: 'flex' }}>
-          <Trash2 size={12} />
+        <button
+          className="nodrag"
+          onClick={() => removeNode(id)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#d4d4d4', padding: 2, display: 'flex', borderRadius: 4, transition: 'color 0.15s' }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#737373')}
+          onMouseLeave={e => (e.currentTarget.style.color = '#d4d4d4')}
+        >
+          <Trash2 size={11} />
         </button>
       </div>
 
+      {/* Body */}
       <div style={{ padding: '10px 12px 12px' }}>
         <textarea
           className="node-textarea nodrag"
@@ -149,17 +164,17 @@ function PromptNodeComponent({ id, data, selected, positionAbsoluteX, positionAb
           placeholder="Enter your prompt for AI expansion..."
           rows={4}
           disabled={isLoading}
-          style={{ color: 'rgba(255,255,255,0.88)', fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}
+          style={{ color: '#171717', fontSize: 13, lineHeight: 1.6, marginBottom: 10, minHeight: 64 }}
         />
 
         {data.status === 'error' && (
           <div style={{
             display: 'flex', alignItems: 'flex-start', gap: 6,
-            background: 'rgba(220,38,38,0.15)', border: '1px solid rgba(220,38,38,0.3)',
+            background: '#fef2f2', border: '1px solid #fecaca',
             borderRadius: 6, padding: '6px 8px', marginBottom: 8,
           }}>
-            <AlertCircle size={12} color="#f87171" style={{ marginTop: 1, flexShrink: 0 }} />
-            <span style={{ color: '#fca5a5', fontSize: 11, lineHeight: 1.4 }}>{data.error}</span>
+            <AlertCircle size={12} color="#dc2626" style={{ marginTop: 1, flexShrink: 0 }} />
+            <span style={{ color: '#dc2626', fontSize: 11, lineHeight: 1.4 }}>{data.error}</span>
           </div>
         )}
 
@@ -168,34 +183,36 @@ function PromptNodeComponent({ id, data, selected, positionAbsoluteX, positionAb
           onClick={onGenerate}
           disabled={isLoading || !localPrompt.trim()}
           style={{
-            width: '100%', padding: '8px 12px',
-            background: isLoading ? 'rgba(37,99,235,0.2)' : 'rgba(37,99,235,0.8)',
-            border: '1px solid rgba(37,99,235,0.6)', borderRadius: 7,
-            color: '#fff', fontSize: 12, fontWeight: 600,
+            width: '100%', padding: '7px 12px',
+            background: isLoading || !localPrompt.trim() ? '#f5f5f5' : '#000',
+            border: '1px solid',
+            borderColor: isLoading || !localPrompt.trim() ? '#e5e5e5' : '#000',
+            borderRadius: 6,
+            color: isLoading || !localPrompt.trim() ? '#a3a3a3' : '#fff',
+            fontSize: 12, fontWeight: 600,
             cursor: isLoading || !localPrompt.trim() ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            transition: 'background 0.2s ease',
-            opacity: !localPrompt.trim() ? 0.5 : 1,
+            transition: 'all 0.15s ease',
           }}
         >
           {isLoading ? (
             <>
-              <div className="spin" style={{ width: 12, height: 12, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid #fff', borderRadius: '50%' }} />
+              <div style={{ width: 11, height: 11, border: '1.5px solid #d4d4d4', borderTop: '1.5px solid #737373', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
               Generating...
             </>
           ) : (
             <>
-              <Sparkles size={12} />
+              <Sparkles size={11} />
               {data.status === 'done' ? 'Regenerate' : 'Generate Ideas'}
             </>
           )}
         </button>
       </div>
 
-      <Handle type="target" position={Position.Left} style={{ left: -6, top: '50%' }} />
-      <Handle type="source" position={Position.Right} style={{ right: -6, top: '50%' }} />
-      <Handle type="target" position={Position.Top} id="top" style={{ top: -6, left: '50%' }} />
-      <Handle type="source" position={Position.Bottom} id="bottom" style={{ bottom: -6, left: '50%' }} />
+      <Handle type="target" position={Position.Left} style={{ left: -5, top: '50%' }} />
+      <Handle type="source" position={Position.Right} style={{ right: -5, top: '50%' }} />
+      <Handle type="target" position={Position.Top} id="top" style={{ top: -5, left: '50%' }} />
+      <Handle type="source" position={Position.Bottom} id="bottom" style={{ bottom: -5, left: '50%' }} />
     </div>
   );
 }

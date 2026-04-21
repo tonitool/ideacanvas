@@ -41,8 +41,8 @@ export default function Toolbar({ onOpenApiKey, onAddNode }: ToolbarProps) {
       {/* Floating sidebar */}
       <div className="fixed left-3 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-1 rounded-xl border border-border bg-card p-1.5 shadow-xl backdrop-blur-sm">
         {/* Logo */}
-        <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-info shadow-inner">
-          <Zap size={16} className="text-white" />
+        <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-lg bg-foreground">
+          <Zap size={16} className="text-background" />
         </div>
 
         <div className="my-0.5 h-px w-full bg-border" />
@@ -163,7 +163,7 @@ export default function Toolbar({ onOpenApiKey, onAddNode }: ToolbarProps) {
 
       {/* Node count badge — top center */}
       <div className="pointer-events-none fixed top-3 left-1/2 z-[100] -translate-x-1/2 flex items-center gap-2 rounded-full border border-border bg-card/85 px-4 py-1.5 shadow-lg backdrop-blur-sm">
-        <span className="bg-gradient-to-r from-primary to-info bg-clip-text text-sm font-bold text-transparent">
+        <span className="text-sm font-bold text-foreground">
           IdeaCanvas
         </span>
         <span className="text-border">·</span>
