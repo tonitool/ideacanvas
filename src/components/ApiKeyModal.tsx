@@ -30,7 +30,7 @@ export default function ApiKeyModal({ onClose }: ApiKeyModalProps) {
             <Key size={18} className="text-primary" />
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-foreground">Anthropic API Key</h3>
+            <h3 className="text-sm font-semibold text-foreground">OpenRouter API Key</h3>
             <p className="text-xs text-muted-foreground">Required for AI idea generation</p>
           </div>
           <Button variant="ghost" size="icon-sm" onClick={onClose}>
@@ -45,7 +45,7 @@ export default function ApiKeyModal({ onClose }: ApiKeyModalProps) {
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onSave()}
-            placeholder="sk-ant-api03-..."
+            placeholder="sk-or-v1-..."
             autoFocus
             className="pr-9 font-mono tracking-widest"
           />
@@ -60,7 +60,9 @@ export default function ApiKeyModal({ onClose }: ApiKeyModalProps) {
         </div>
 
         <p className="mb-5 text-[11px] leading-relaxed text-muted-foreground">
-          Stored only in your browser's localStorage. Never sent anywhere except directly to Anthropic's API.
+          Get your key at{' '}
+          <span className="text-primary">openrouter.ai/keys</span>.
+          Stored only in your browser's localStorage — never sent anywhere except OpenRouter's API.
         </p>
 
         {/* Actions */}

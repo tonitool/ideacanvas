@@ -22,10 +22,10 @@ interface CanvasStore {
 export const useCanvasStore = create<CanvasStore>((set, get) => ({
   nodes: [],
   edges: [],
-  apiKey: localStorage.getItem('anthropic_api_key') || '',
+  apiKey: localStorage.getItem('openrouter_api_key') || '',
 
   setApiKey: (key) => {
-    localStorage.setItem('anthropic_api_key', key);
+    localStorage.setItem('openrouter_api_key', key);
     set({ apiKey: key });
   },
 

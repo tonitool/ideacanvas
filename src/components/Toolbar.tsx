@@ -86,7 +86,7 @@ export default function Toolbar({ onOpenApiKey, onAddNode }: ToolbarProps) {
             )}
             <Key size={16} />
           </TooltipTrigger>
-          <TooltipContent>{apiKey ? 'API key set' : 'Set API key'}</TooltipContent>
+          <TooltipContent>{apiKey ? 'OpenRouter key set' : 'Set OpenRouter API key'}</TooltipContent>
         </Tooltip>
 
         <Tooltip>

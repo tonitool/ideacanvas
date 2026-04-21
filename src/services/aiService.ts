@@ -1,15 +1,37 @@
-import Anthropic from '@anthropic-ai/sdk';
-import type { AIGenerateResult } from '../types';
+import type { AIGenerateResult } from '@/types';
 
-let _client: Anthropic | null = null;
-let _clientKey = '';
+const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
+const DEFAULT_MODEL = 'anthropic/claude-3.5-sonnet';
 
-function getClient(apiKey: string): Anthropic {
-  if (!_client || _clientKey !== apiKey) {
-    _client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
-    _clientKey = apiKey;
+async function chatCompletion(
+  apiKey: string,
+  messages: { role: 'system' | 'user' | 'assistant'; content: string }[],
+  model = DEFAULT_MODEL,
+  maxTokens = 1024
+): Promise<string> {
+  const res = await fetch(`${OPENROUTER_BASE}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'HTTP-Referer': 'https://ideacanvas.app',
+      'X-Title': 'IdeaCanvas',
+    },
+    body: JSON.stringify({ model, messages, max_tokens: maxTokens }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(
+      (err as { error?: { message?: string } }).error?.message ||
+      `OpenRouter error ${res.status}`
+    );
   }
-  return _client;
+
+  const data = await res.json() as {
+    choices: { message: { content: string } }[];
+  };
+  return data.choices[0]?.message?.content ?? '';
 }
 
 export async function generateIdeas(
@@ -17,14 +39,17 @@ export async function generateIdeas(
   prompt: string,
   context: string[]
 ): Promise<AIGenerateResult> {
-  const anthropic = getClient(apiKey);
-
   const contextBlock =
     context.length > 0
       ? `\n\nContext from connected nodes:\n${context.map((c, i) => `[${i + 1}] ${c}`).join('\n')}`
       : '';
 
-  const systemPrompt = `You are an idea expansion AI. Given a user prompt and optional context, you:
+  const text = await chatCompletion(
+    apiKey,
+    [
+      {
+        role: 'system',
+        content: `You are an idea expansion AI. Given a user prompt and optional context, you:
 1. Generate a concise summary (2-3 sentences) that synthesizes the prompt and context.
 2. Generate exactly 4 distinct, actionable sub-ideas that expand on the topic.
 
@@ -34,19 +59,14 @@ Always respond with valid JSON in this exact format:
   "ideas": ["idea 1", "idea 2", "idea 3", "idea 4"]
 }
 
-Keep ideas concise (1-2 sentences each). Be creative and insightful.`;
-
-  const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages: [{ role: 'user', content: `Prompt: ${prompt}${contextBlock}` }],
-  });
-
-  const text = message.content
-    .filter((b) => b.type === 'text')
-    .map((b) => (b as { type: 'text'; text: string }).text)
-    .join('');
+Keep ideas concise (1-2 sentences each). Be creative and insightful.`,
+      },
+      {
+        role: 'user',
+        content: `Prompt: ${prompt}${contextBlock}`,
+      },
+    ]
+  );
 
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('AI response did not contain valid JSON');
@@ -60,21 +80,15 @@ Keep ideas concise (1-2 sentences each). Be creative and insightful.`;
 }
 
 export async function summarizeNodes(apiKey: string, nodeContents: string[]): Promise<string> {
-  const anthropic = getClient(apiKey);
-
-  const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 512,
-    messages: [
+  return chatCompletion(
+    apiKey,
+    [
       {
         role: 'user',
         content: `Summarize these ideas into a single cohesive paragraph (3-4 sentences max):\n\n${nodeContents.map((c, i) => `${i + 1}. ${c}`).join('\n')}`,
       },
     ],
-  });
-
-  return message.content
-    .filter((b) => b.type === 'text')
-    .map((b) => (b as { type: 'text'; text: string }).text)
-    .join('');
+    DEFAULT_MODEL,
+    512
+  );
 }
