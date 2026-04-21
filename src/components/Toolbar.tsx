@@ -1,20 +1,18 @@
 import { useState } from 'react';
 import { Lightbulb, Sparkles, Image as ImageIcon, Trash2, Key, HelpCircle, Zap } from 'lucide-react';
 import type { Node } from '@xyflow/react';
-import { useCanvasStore } from '../store/canvasStore';
-import type { IdeaNodeData, PromptNodeData, ImageNodeData, CustomNodeData } from '../types';
-import { IDEA_COLORS } from '../types';
+import { useCanvasStore } from '@/store/canvasStore';
+import type { IdeaNodeData, PromptNodeData, ImageNodeData, CustomNodeData } from '@/types';
+import { IDEA_COLORS } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface ToolbarProps {
   onOpenApiKey: () => void;
   onAddNode: (node: Node<CustomNodeData>) => void;
 }
-
-const TOOL_BUTTONS = [
-  { type: 'idea', icon: Lightbulb, label: 'Idea Node', color: '#7c3aed', shortcut: 'I' },
-  { type: 'prompt', icon: Sparkles, label: 'AI Prompt', color: '#2563eb', shortcut: 'P' },
-  { type: 'image', icon: ImageIcon, label: 'Image Node', color: '#0891b2', shortcut: 'G' },
-];
 
 let nodeCounter = 0;
 function genId(prefix: string) {
@@ -25,232 +23,161 @@ export default function Toolbar({ onOpenApiKey, onAddNode }: ToolbarProps) {
   const { clearCanvas, apiKey, nodes } = useCanvasStore();
   const [showHelp, setShowHelp] = useState(false);
 
-  const createNode = (type: string) => {
+  const createNode = (type: 'idea' | 'prompt' | 'image') => {
     const cx = window.innerWidth / 2 - 100 + Math.random() * 60 - 30;
     const cy = window.innerHeight / 2 - 80 + Math.random() * 60 - 30;
 
     if (type === 'idea') {
-      onAddNode({
-        id: genId('idea'),
-        type: 'idea',
-        position: { x: cx, y: cy },
-        data: { kind: 'idea', text: '', color: IDEA_COLORS[0] } as IdeaNodeData,
-      });
+      onAddNode({ id: genId('idea'), type: 'idea', position: { x: cx, y: cy }, data: { kind: 'idea', text: '', color: IDEA_COLORS[0] } as IdeaNodeData });
     } else if (type === 'prompt') {
-      onAddNode({
-        id: genId('prompt'),
-        type: 'prompt',
-        position: { x: cx, y: cy },
-        data: { kind: 'prompt', prompt: '', status: 'idle' } as PromptNodeData,
-      });
+      onAddNode({ id: genId('prompt'), type: 'prompt', position: { x: cx, y: cy }, data: { kind: 'prompt', prompt: '', status: 'idle' } as PromptNodeData });
     } else if (type === 'image') {
-      onAddNode({
-        id: genId('image'),
-        type: 'image',
-        position: { x: cx, y: cy },
-        data: { kind: 'image', url: '', caption: '' } as ImageNodeData,
-      });
+      onAddNode({ id: genId('image'), type: 'image', position: { x: cx, y: cy }, data: { kind: 'image', url: '', caption: '' } as ImageNodeData });
     }
   };
 
   return (
-    <>
-      <div
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: 16,
-          transform: 'translateY(-50%)',
-          zIndex: 100,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 6,
-          background: 'rgba(26,26,46,0.9)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 14,
-          padding: 8,
-          backdropFilter: 'blur(12px)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-        }}
-      >
-        <div
-          style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: 'linear-gradient(135deg, rgba(124,58,237,0.8), rgba(37,99,235,0.8))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4,
-          }}
-        >
-          <Zap size={18} color="#fff" />
+    <TooltipProvider>
+      {/* Floating sidebar */}
+      <div className="fixed left-3 top-1/2 -translate-y-1/2 z-[100] flex flex-col gap-1 rounded-xl border border-border bg-card p-1.5 shadow-xl backdrop-blur-sm">
+        {/* Logo */}
+        <div className="mb-1 flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-info shadow-inner">
+          <Zap size={16} className="text-white" />
         </div>
 
-        <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.06)', margin: '2px 0' }} />
+        <div className="my-0.5 h-px w-full bg-border" />
 
-        {TOOL_BUTTONS.map((btn) => (
-          <ToolButton
-            key={btn.type}
-            icon={btn.icon}
-            label={btn.label}
-            color={btn.color}
-            shortcut={btn.shortcut}
-            onClick={() => createNode(btn.type)}
-          />
-        ))}
+        <Tooltip>
+          <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={() => createNode('idea')} />}>
+            <Lightbulb size={16} />
+          </TooltipTrigger>
+          <TooltipContent>Idea node <kbd className="ml-1 rounded border border-border bg-muted px-1 font-mono text-[10px] text-muted-foreground">I</kbd></TooltipContent>
+        </Tooltip>
 
-        <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.06)', margin: '2px 0' }} />
+        <Tooltip>
+          <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={() => createNode('prompt')} />}>
+            <Sparkles size={16} />
+          </TooltipTrigger>
+          <TooltipContent>AI Prompt <kbd className="ml-1 rounded border border-border bg-muted px-1 font-mono text-[10px] text-muted-foreground">P</kbd></TooltipContent>
+        </Tooltip>
 
-        <ToolButton
-          icon={Key}
-          label="API Key"
-          color={apiKey ? '#059669' : '#d97706'}
-          onClick={onOpenApiKey}
-          dot={!apiKey}
-        />
-        <ToolButton
-          icon={HelpCircle}
-          label="Help"
-          color="#6b7280"
-          onClick={() => setShowHelp(!showHelp)}
-        />
+        <Tooltip>
+          <TooltipTrigger render={<Button variant="ghost" size="icon" onClick={() => createNode('image')} />}>
+            <ImageIcon size={16} />
+          </TooltipTrigger>
+          <TooltipContent>Image node</TooltipContent>
+        </Tooltip>
 
-        <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.06)', margin: '2px 0' }} />
+        <div className="my-0.5 h-px w-full bg-border" />
 
-        <ToolButton
-          icon={Trash2}
-          label="Clear canvas"
-          color="#dc2626"
-          onClick={() => {
-            if (nodes.length === 0 || confirm('Clear all nodes and connections?')) {
-              clearCanvas();
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onOpenApiKey}
+                className={cn('relative', apiKey ? 'text-success hover:text-success' : 'text-warning hover:text-warning')}
+              />
             }
-          }}
-        />
+          >
+            {!apiKey && (
+              <span className="absolute right-1 top-1 size-1.5 rounded-full bg-warning" />
+            )}
+            <Key size={16} />
+          </TooltipTrigger>
+          <TooltipContent>{apiKey ? 'API key set' : 'Set API key'}</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowHelp(!showHelp)}
+                className={cn(showHelp && 'bg-accent text-accent-foreground')}
+              />
+            }
+          >
+            <HelpCircle size={16} />
+          </TooltipTrigger>
+          <TooltipContent>Help & shortcuts</TooltipContent>
+        </Tooltip>
+
+        <div className="my-0.5 h-px w-full bg-border" />
+
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => { if (nodes.length === 0 || confirm('Clear all nodes and connections?')) clearCanvas(); }}
+                className="text-destructive hover:text-destructive"
+              />
+            }
+          >
+            <Trash2 size={16} />
+          </TooltipTrigger>
+          <TooltipContent>Clear canvas</TooltipContent>
+        </Tooltip>
       </div>
 
+      {/* Help panel */}
       {showHelp && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: 72,
-            transform: 'translateY(-50%)',
-            zIndex: 99,
-            background: 'rgba(26,26,46,0.95)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: 12,
-            padding: 16,
-            width: 220,
-            backdropFilter: 'blur(12px)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-          }}
-        >
-          <h4 style={{ color: '#fff', fontSize: 12, fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Keyboard Shortcuts
-          </h4>
-          {[
-            ['Double-click canvas', 'New Idea node'],
-            ['I', 'Add Idea node'],
-            ['P', 'Add Prompt node'],
-            ['G', 'Add Image node'],
-            ['Delete / Backspace', 'Remove selected'],
-            ['Shift + drag', 'Multi-select'],
-            ['Scroll', 'Zoom in/out'],
-            ['Middle-drag', 'Pan canvas'],
-          ].map(([key, action]) => (
-            <div key={key} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, alignItems: 'center' }}>
-              <kbd style={{
-                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 4, padding: '2px 6px', fontSize: 10,
-                color: 'rgba(255,255,255,0.7)', fontFamily: 'monospace',
-              }}>
-                {key}
-              </kbd>
-              <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>{action}</span>
-            </div>
-          ))}
-          <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, lineHeight: 1.5 }}>
-              Connect nodes by dragging from a handle. Use AI Prompt nodes to generate idea expansions.
-            </p>
+        <div className="fixed left-16 top-1/2 z-[99] -translate-y-1/2 w-56 rounded-xl border border-border bg-card p-4 shadow-xl backdrop-blur-sm">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Shortcuts</p>
+          <div className="space-y-2">
+            {([
+              ['I', 'Add Idea node'],
+              ['P', 'Add Prompt node'],
+              ['Dbl-click', 'New Idea node'],
+              ['Delete', 'Remove selected'],
+              ['Shift+drag', 'Multi-select'],
+              ['Scroll', 'Zoom in/out'],
+              ['Mid-drag', 'Pan canvas'],
+            ] as [string, string][]).map(([key, label]) => (
+              <div key={key} className="flex items-center justify-between">
+                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">{key}</kbd>
+                <span className="text-xs text-muted-foreground">{label}</span>
+              </div>
+            ))}
           </div>
+          <p className="mt-3 border-t border-border pt-3 text-[11px] leading-relaxed text-muted-foreground">
+            Drag from a handle (●) to connect nodes. Use AI Prompt nodes to expand ideas.
+          </p>
         </div>
       )}
 
+      {/* No API key nudge */}
       {!apiKey && (
-        <div
+        <button
           onClick={onOpenApiKey}
-          style={{
-            position: 'fixed', bottom: 20, left: '50%', transform: 'translateX(-50%)',
-            zIndex: 100, background: 'rgba(217,119,6,0.15)',
-            border: '1px solid rgba(217,119,6,0.4)', borderRadius: 20,
-            padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 6,
-            cursor: 'pointer', color: '#fbbf24', fontSize: 12, fontWeight: 500,
-            backdropFilter: 'blur(8px)',
-          }}
+          className="fixed bottom-5 left-1/2 z-[100] -translate-x-1/2 flex items-center gap-2 rounded-full border border-warning/40 bg-warning/10 px-4 py-1.5 text-xs font-medium text-warning backdrop-blur-sm transition-colors hover:bg-warning/15"
         >
           <Key size={12} />
           Set your Anthropic API key to enable AI features
-        </div>
+        </button>
       )}
-    </>
-  );
-}
 
-interface ToolButtonProps {
-  icon: React.ComponentType<{ size?: number; color?: string }>;
-  label: string;
-  color: string;
-  onClick: () => void;
-  shortcut?: string;
-  dot?: boolean;
-}
-
-function ToolButton({ icon: Icon, label, color, onClick, shortcut, dot }: ToolButtonProps) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <button
-        onClick={onClick}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        title={label}
-        style={{
-          width: 36, height: 36, borderRadius: 8,
-          background: hovered ? `${color}22` : 'transparent',
-          border: `1px solid ${hovered ? `${color}55` : 'transparent'}`,
-          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'all 0.15s ease', position: 'relative',
-        }}
-      >
-        <Icon size={16} color={hovered ? color : 'rgba(255,255,255,0.5)'} />
-        {dot && (
-          <div style={{
-            position: 'absolute', top: 5, right: 5,
-            width: 6, height: 6, borderRadius: '50%', background: '#f59e0b',
-          }} />
+      {/* Node count badge — top center */}
+      <div className="pointer-events-none fixed top-3 left-1/2 z-[100] -translate-x-1/2 flex items-center gap-2 rounded-full border border-border bg-card/85 px-4 py-1.5 shadow-lg backdrop-blur-sm">
+        <span className="bg-gradient-to-r from-primary to-info bg-clip-text text-sm font-bold text-transparent">
+          IdeaCanvas
+        </span>
+        <span className="text-border">·</span>
+        <span className="text-xs text-muted-foreground">{nodes.length} node{nodes.length !== 1 ? 's' : ''}</span>
+        {apiKey && (
+          <>
+            <span className="text-border">·</span>
+            <Badge variant="success" className="pointer-events-none">
+              <span className="size-1.5 rounded-full bg-success" />
+              AI ready
+            </Badge>
+          </>
         )}
-      </button>
-
-      {hovered && (
-        <div style={{
-          position: 'absolute', left: 'calc(100% + 8px)', top: '50%', transform: 'translateY(-50%)',
-          background: '#1a1a2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6,
-          padding: '4px 10px', whiteSpace: 'nowrap', fontSize: 12, color: 'rgba(255,255,255,0.85)',
-          pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: 8,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.4)', zIndex: 200,
-        }}>
-          {label}
-          {shortcut && (
-            <kbd style={{
-              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: 3, padding: '1px 5px', fontSize: 10, fontFamily: 'monospace',
-              color: 'rgba(255,255,255,0.4)',
-            }}>
-              {shortcut}
-            </kbd>
-          )}
-        </div>
-      )}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

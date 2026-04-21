@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Key, Eye, EyeOff, X } from 'lucide-react';
-import { useCanvasStore } from '../store/canvasStore';
+import { useCanvasStore } from '@/store/canvasStore';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ApiKeyModalProps {
   onClose: () => void;
@@ -18,91 +20,66 @@ export default function ApiKeyModal({ onClose }: ApiKeyModalProps) {
 
   return (
     <div
-      style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)',
-        backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', zIndex: 1000,
-      }}
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div style={{
-        background: '#1a1a2e', border: '1px solid rgba(124,58,237,0.3)',
-        borderRadius: 14, padding: 28, width: 420,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: 'rgba(124,58,237,0.2)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Key size={18} color="#a78bfa" />
+      <div className="w-[420px] rounded-2xl border border-border bg-card p-6 shadow-2xl">
+        {/* Header */}
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+            <Key size={18} className="text-primary" />
           </div>
-          <div style={{ flex: 1 }}>
-            <h3 style={{ color: '#fff', fontSize: 15, fontWeight: 600, margin: 0 }}>Anthropic API Key</h3>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, margin: 0 }}>Required for AI idea generation</p>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-foreground">Anthropic API Key</h3>
+            <p className="text-xs text-muted-foreground">Required for AI idea generation</p>
           </div>
-          <button onClick={onClose}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 4 }}>
-            <X size={18} />
-          </button>
+          <Button variant="ghost" size="icon-sm" onClick={onClose}>
+            <X size={15} />
+          </Button>
         </div>
 
-        <div style={{ position: 'relative', marginBottom: 14 }}>
-          <input
+        {/* Input */}
+        <div className="relative mb-3">
+          <Input
             type={show ? 'text' : 'password'}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onSave()}
-            placeholder="sk-ant-..."
+            placeholder="sk-ant-api03-..."
             autoFocus
-            style={{
-              width: '100%', background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(124,58,237,0.3)', borderRadius: 8,
-              padding: '10px 40px 10px 12px', color: 'rgba(255,255,255,0.88)',
-              fontSize: 13, outline: 'none', fontFamily: 'monospace', boxSizing: 'border-box',
-            }}
+            className="pr-9 font-mono tracking-widest"
           />
-          <button onClick={() => setShow(!show)}
-            style={{
-              position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'rgba(255,255,255,0.4)', padding: 2, display: 'flex',
-            }}>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setShow(!show)}
+            className="absolute right-1 top-1/2 -translate-y-1/2"
+          >
             {show ? <EyeOff size={14} /> : <Eye size={14} />}
-          </button>
+          </Button>
         </div>
 
-        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, marginBottom: 20, lineHeight: 1.5 }}>
-          Your key is stored only in your browser's localStorage and never sent anywhere except Anthropic's API.
+        <p className="mb-5 text-[11px] leading-relaxed text-muted-foreground">
+          Stored only in your browser's localStorage. Never sent anywhere except directly to Anthropic's API.
         </p>
 
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            onClick={onSave}
+        {/* Actions */}
+        <div className="flex gap-2">
+          <Button
+            variant="default"
+            className="flex-1"
             disabled={!draft.trim()}
-            style={{
-              flex: 1, padding: '10px',
-              background: draft.trim() ? 'rgba(124,58,237,0.8)' : 'rgba(124,58,237,0.2)',
-              border: '1px solid rgba(124,58,237,0.5)', borderRadius: 8,
-              color: '#fff', fontSize: 13, fontWeight: 600,
-              cursor: draft.trim() ? 'pointer' : 'not-allowed',
-              transition: 'background 0.2s ease',
-            }}
+            onClick={onSave}
           >
             Save Key
-          </button>
+          </Button>
           {apiKey && (
-            <button
+            <Button
+              variant="destructive-outline"
               onClick={() => { setApiKey(''); setDraft(''); }}
-              style={{
-                padding: '10px 14px', background: 'rgba(220,38,38,0.1)',
-                border: '1px solid rgba(220,38,38,0.3)', borderRadius: 8,
-                color: '#f87171', fontSize: 13, cursor: 'pointer',
-              }}
             >
               Clear
-            </button>
+            </Button>
           )}
         </div>
       </div>

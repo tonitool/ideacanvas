@@ -11,12 +11,12 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { nodeTypes } from './nodes/nodeTypes';
-import { useCanvasStore } from './store/canvasStore';
-import Toolbar from './components/Toolbar';
-import ApiKeyModal from './components/ApiKeyModal';
-import type { IdeaNode, PromptNode, CustomNode, CustomNodeData } from './types';
-import { IDEA_COLORS } from './types';
+import { nodeTypes } from '@/nodes/nodeTypes';
+import { useCanvasStore } from '@/store/canvasStore';
+import Toolbar from '@/components/Toolbar';
+import ApiKeyModal from '@/components/ApiKeyModal';
+import type { IdeaNode, PromptNode, CustomNode, CustomNodeData } from '@/types';
+import { IDEA_COLORS } from '@/types';
 
 let counter = 0;
 function uid(prefix: string) {
@@ -153,36 +153,6 @@ function CanvasInner() {
       </ReactFlow>
 
       <Toolbar onOpenApiKey={() => setApiKeyOpen(true)} onAddNode={(n) => addNode(n as CustomNode)} />
-
-      <div style={{
-        position: 'fixed', top: 12, left: '50%', transform: 'translateX(-50%)',
-        zIndex: 100, background: 'rgba(26,26,46,0.85)',
-        border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20,
-        padding: '5px 16px', display: 'flex', alignItems: 'center', gap: 8,
-        backdropFilter: 'blur(12px)', boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-        pointerEvents: 'none',
-      }}>
-        <span style={{
-          background: 'linear-gradient(135deg, #a78bfa, #60a5fa)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em',
-        }}>
-          IdeaCanvas
-        </span>
-        <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>·</span>
-        <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
-          {nodes.length} node{nodes.length !== 1 ? 's' : ''}
-        </span>
-        {apiKey && (
-          <>
-            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>·</span>
-            <span style={{ color: 'rgba(5,150,105,0.8)', fontSize: 11, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#10b981' }} />
-              AI ready
-            </span>
-          </>
-        )}
-      </div>
 
       {apiKeyOpen && <ApiKeyModal onClose={() => setApiKeyOpen(false)} />}
     </div>
